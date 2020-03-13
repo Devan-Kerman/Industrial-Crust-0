@@ -1,5 +1,7 @@
 package net.devtech.industrialcrust.blocks.power;
 
+import org.bukkit.block.BlockFace;
+
 /**
  * represents an object who's power can be drained from
  */

@@ -5,13 +5,14 @@ import net.devtech.asyncore.blocks.BlockDataAccess;
 public interface EnergyProducer extends BlockDataAccess, EnergyDrain, EnergyHolder {
 	@Override
 	default int suck(int power) {
-		if(power > this.getPower()) {
+		int toTake = Math.min(power, this.getMaxCurrent());
+		if (toTake > this.getPower()) {
 			int old = this.getPower();
 			this.setPower(0);
 			return old;
 		} else {
-			this.setPower(this.getPower() - power);
-			return power;
+			this.setPower(this.getPower() - toTake);
+			return toTake;
 		}
 	}
 }

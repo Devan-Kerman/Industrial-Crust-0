@@ -1,7 +1,9 @@
 package net.devtech.industrialcrust.util;
 
 import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 import org.jetbrains.annotations.NotNull;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class Positions {
@@ -32,5 +34,9 @@ public class Positions {
 				throw new IllegalStateException("no");
 			}
 		};
+	}
+
+	public static Iterable<BlockFace> getFaces() {
+		return Arrays.asList(BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST);
 	}
 }

@@ -5,37 +5,27 @@ import net.devtech.asyncore.blocks.events.TickEvent;
 import net.devtech.asyncore.blocks.world.events.LocalEvent;
 import net.devtech.industrialcrust.util.Positions;
 import org.bukkit.Location;
-import java.util.function.IntUnaryOperator;
-import java.util.function.Predicate;
-import java.util.function.ToIntBiFunction;
+import org.bukkit.block.BlockFace;
 
 /**
  * an electrical conductor
  */
-public interface Conductor extends EnergyDrain, EnergySink, BlockDataAccess, EnergyHolder {
+public interface Conductor extends EnergyDrain, BlockDataAccess, EnergyHolder {
 	boolean getRecursiveLock();
 
 	void setRecursiveLock(boolean lock);
 
 	@Override
 	default int suck(int power) {
-		return this.compute(power, o -> o instanceof EnergyDrain, EnergyDrain::suck, b -> Math.max(power - b, 0));
-	}
-
-	@Override
-	default int add(int power) {
-		return this.compute(power, o -> o instanceof EnergySink, EnergySink::add, b -> b);
-	}
-
-	default <T> int compute(int power, Predicate<Object> type, ToIntBiFunction<T, Integer> execute,
-	                        IntUnaryOperator operator) {
 		if (!this.getRecursiveLock()) {
 			this.setRecursiveLock(true);
 			int remaining = power;
-			for (Location location : Positions.touching(this.getLocation())) {
-				Object object = this.getAccess().get(location);
-				if (type.test(object)) {
-					int sucked = execute.applyAsInt((T) object, power);
+			for (BlockFace current : Positions.getFaces()) {
+				Object object = this.getAccess().get(this.getLocation()
+				                                         .add(current.getModX(), current.getModY(),
+				                                              current.getModZ()));
+				if (object instanceof EnergyDrain) {
+					int sucked = ((EnergyDrain) object).suck(power);
 					remaining -= sucked;
 				}
 				// debug : if less than one, there is power loss
@@ -45,7 +35,7 @@ public interface Conductor extends EnergyDrain, EnergySink, BlockDataAccess, Ene
 			this.setRecursiveLock(false);
 			this.setPower(this.getPower() + Math.max(power - remaining, 0));
 
-			return operator.applyAsInt(remaining);
+			return Math.max(power - remaining, 0);
 		}
 		return 0;
 	}

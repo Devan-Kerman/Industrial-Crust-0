@@ -1,22 +1,40 @@
 package net.devtech.industrialcrust.blocks.machines.generators;
 
+import net.devtech.asyncore.AsynCore;
 import net.devtech.asyncore.blocks.events.TickEvent;
 import net.devtech.asyncore.blocks.world.events.LocalEvent;
+import net.devtech.asyncore.gui.components.AFilteredInputInventoryComponent;
+import net.devtech.asyncore.gui.components.AHorizontalStatusBar;
+import net.devtech.asyncore.gui.components.APanel;
+import net.devtech.asyncore.util.Size2i;
+import net.devtech.asyncore.util.inv.ArrayInvWrapper;
+import net.devtech.asyncore.util.inv.Inventories;
 import net.devtech.asyncore.world.server.ServerAccess;
 import net.devtech.industrialcrust.blocks.AbstractBlockItem;
 import net.devtech.industrialcrust.blocks.power.EnergyProducer;
+import net.devtech.industrialcrust.util.BurnTime;
 import net.devtech.yajslib.annotations.Reader;
 import net.devtech.yajslib.annotations.Writer;
 import net.devtech.yajslib.io.PersistentInput;
 import net.devtech.yajslib.io.PersistentOutput;
 import net.devtech.yajslib.persistent.PersistentRegistry;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import java.awt.Point;
 import java.io.IOException;
 
 public class CoalGenerator extends AbstractBlockItem implements EnergyProducer {
+	private ItemStack[] burning = new ItemStack[9];
+	private Inventory inventory = Bukkit.createInventory(null, 27, "Coal Generator");
 	private int power;
+	private int burnTime;
+	private int maxTime;
 
 	protected CoalGenerator(PersistentRegistry registry, ServerAccess<Object> access) {
 		super(registry, access);
@@ -24,7 +42,44 @@ public class CoalGenerator extends AbstractBlockItem implements EnergyProducer {
 
 	@LocalEvent
 	private void tick(TickEvent event) {
-		this.power += 5; // todo gui fuel etc.
+		AsynCore.guiManager.resync(this.inventory);
+		if(this.burnTime <= 0) {
+			ItemStack[] next = {null};
+			Inventories.mergeOne(this.burning, next);
+			ItemStack burn = next[0];
+			if(burn != null) {
+				this.maxTime = BurnTime.getBurnTime(burn.getType());
+				this.burnTime = this.maxTime;
+				AsynCore.guiManager.redraw(this.inventory);
+			}
+		} else {
+			this.burnTime--;
+			this.power += 10;
+			AsynCore.guiManager.redraw(this.inventory);
+		}
+	}
+
+	@LocalEvent
+	private void gui(PlayerInteractEvent event) {
+		if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !event.getPlayer().isSneaking()) {
+			event.setCancelled(true);
+			APanel panel = new APanel(new Size2i(3, 9));
+			panel
+			.addComponent(new Point(0, 0), new AFilteredInputInventoryComponent(new ArrayInvWrapper(this.burning),
+			                                                                    new Size2i(9, 1), i -> i
+			                                                                                           .getType()
+			                                                                                           .isFuel()));
+			panel
+			.addComponent(new Point(0, 1), new AHorizontalStatusBar(new ItemStack(Material.LAVA_BUCKET),
+			                                                        new ItemStack(Material.BUCKET), null,
+			                                                        () -> this.burnTime / ((double) this.maxTime), 9));
+			panel
+			.addComponent(new Point(0, 2), new AHorizontalStatusBar(new ItemStack(Material.EXP_BOTTLE),
+			                                                        new ItemStack(Material.GLASS_BOTTLE), null,
+			                                                        () -> this.power / ((double) this
+			                                                                                     .getMaxPower()), 9));
+			AsynCore.guiManager.openGui(event.getPlayer(), panel, this.inventory);
+		}
 	}
 
 	@Override
@@ -34,7 +89,7 @@ public class CoalGenerator extends AbstractBlockItem implements EnergyProducer {
 
 	@Override
 	protected String name() {
-		return ChatColor.BLACK + "Coal Generator " + this.power;
+		return ChatColor.DARK_GRAY + "Coal Generator " + this.power;
 	}
 
 	@Override
@@ -61,11 +116,13 @@ public class CoalGenerator extends AbstractBlockItem implements EnergyProducer {
 	private void write(PersistentOutput out) throws IOException {
 		out.writePersistent(this.getLocation());
 		out.writeInt(this.power);
+		out.writeArrayNoLength(this.burning);
 	}
 
 	@Reader (895695095093409409L)
 	private void read(PersistentInput in) throws IOException {
 		this.setLocation((Location) in.readPersistent());
 		this.power = in.readInt();
+		in.readArray(this.burning);
 	}
 }

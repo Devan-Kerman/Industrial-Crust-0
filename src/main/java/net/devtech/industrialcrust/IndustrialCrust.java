@@ -14,6 +14,7 @@ import net.devtech.industrialcrust.blocks.ores.LeadOreBlock;
 import net.devtech.industrialcrust.blocks.ores.TinOreBlock;
 import net.devtech.industrialcrust.blocks.ores.UraniumOreBlock;
 import net.devtech.industrialcrust.hwla.HWWLAManager;
+import net.devtech.industrialcrust.items.battery.BasicBattery;
 import net.devtech.industrialcrust.items.ingots.*;
 import net.devtech.industrialcrust.items.interfaces.CanConsume;
 import net.devtech.industrialcrust.items.materials.Resin;
@@ -22,6 +23,7 @@ import net.devtech.industrialcrust.items.plates.*;
 import net.devtech.industrialcrust.items.tools.BukkitHammer;
 import net.devtech.industrialcrust.items.tools.TreeTap;
 import net.devtech.industrialcrust.persistent.EmptyBlockPersistent;
+import net.devtech.industrialcrust.persistent.GsonPersistent;
 import net.devtech.utilib.functions.ThrowingSupplier;
 import net.devtech.yajslib.persistent.AnnotatedPersistent;
 import net.devtech.yajslib.persistent.Persistent;
@@ -33,12 +35,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.lang.reflect.Constructor;
 
 public final class IndustrialCrust extends JavaPlugin implements Listener {
 	public static IndustrialCrust instance;
-	private final HWWLAManager manager = new HWWLAManager();
+	private final HWWLAManager hwwlaManager = new HWWLAManager();
 
 	@Override
 	public void onEnable() {
@@ -78,12 +81,14 @@ public final class IndustrialCrust extends JavaPlugin implements Listener {
 			registerAnnotatedBlock(BatteryBocs.class, 3435434544343433L);
 			registerAnnotatedBlock(CopperCable.class, 54564634563487548L);
 			registerAnnotatedBlock(CoalGenerator.class, 895695095093409409L);
+			// batteries
+			registerGson(BasicBattery.class, 490328323289892L);
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
 		}
 
 		// hwla manager
-		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, this.manager::tick, 2, 8);
+		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, this.hwwlaManager::tick, 2, 8);
 		// Plugin startup logic
 	}
 
@@ -98,10 +103,13 @@ public final class IndustrialCrust extends JavaPlugin implements Listener {
 		this.give(player, BatteryBocs.class);
 		this.give(player, CopperCable.class);
 		this.give(player, CoalGenerator.class);
+		this.give(player, BasicBattery.class);
 	}
 
 	private void give(Player player, Class<? extends CustomItem> item) {
-		player.getInventory().addItem(CustomItemFactory.createNew(AsynCore.persistentRegistry, item));
+		ItemStack stack = CustomItemFactory.createNew(AsynCore.persistentRegistry, item);
+		System.out.println((Object) CustomItemFactory.from(stack, AsynCore.persistentRegistry));
+		player.getInventory().addItem(stack);
 	}
 
 	private static <T extends AbstractBlock> void registerEmptyBlock(Class<T> type, long versionHash) throws NoSuchMethodException {
@@ -126,5 +134,9 @@ public final class IndustrialCrust extends JavaPlugin implements Listener {
 
 	private static <T> void register(Class<T> type, Persistent<T> persistent) {
 		AsynCore.persistentRegistry.register(type, persistent);
+	}
+
+	private static <T> void registerGson(Class<T> type, long versionHash) {
+		AsynCore.persistentRegistry.register(type, new GsonPersistent<>(versionHash, type));
 	}
 }
