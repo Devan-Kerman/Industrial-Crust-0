@@ -3,3 +3,5 @@ version: @version@
 main: @group@.@pluginname@.@pluginName@
 api-version: 1.13
 authors: [HalfOf2]
+depend:
+  - AsynCore
