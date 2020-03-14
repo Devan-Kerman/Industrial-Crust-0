@@ -5,11 +5,8 @@ import net.devtech.asyncore.blocks.events.PlaceEvent;
 import net.devtech.asyncore.blocks.world.events.LocalEvent;
 import net.devtech.asyncore.items.blocks.BlockItem;
 import net.devtech.asyncore.world.server.ServerAccess;
-import net.devtech.industrialcrust.util.SkullCreator;
+import net.devtech.industrialcrust.util.SkullUtil;
 import net.devtech.yajslib.persistent.PersistentRegistry;
-import org.bukkit.ChatColor;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.Skull;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -23,7 +20,7 @@ public abstract class AbstractOreBlock extends AbstractBlock implements BlockIte
 
 	@Override
 	public ItemStack createBaseStack() {
-		ItemStack skull = SkullCreator
+		ItemStack skull = SkullUtil
 		                  .itemFromBase64(this.getUrl());
 		ItemMeta meta = skull.getItemMeta();
 		meta.setDisplayName(this.name);
@@ -34,9 +31,9 @@ public abstract class AbstractOreBlock extends AbstractBlock implements BlockIte
 
 	@LocalEvent
 	public final void place(PlaceEvent event) {
-		SkullCreator.blockWithBase64(event
+		SkullUtil.blockWithBase64(event
 		                             .getBlock(),
-		                             this.getUrl());
+		                          this.getUrl());
 	}
 
 	protected abstract String getUrl();

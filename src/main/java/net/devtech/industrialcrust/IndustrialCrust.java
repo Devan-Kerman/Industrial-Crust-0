@@ -4,7 +4,9 @@ import net.devtech.asyncore.AsynCore;
 import net.devtech.asyncore.blocks.AbstractBlock;
 import net.devtech.asyncore.items.CustomItem;
 import net.devtech.asyncore.items.CustomItemFactory;
+import net.devtech.asyncore.util.persistents.BukkitPersistent;
 import net.devtech.asyncore.world.server.ServerAccess;
+import net.devtech.industrialcrust.blocks.machines.Grinder;
 import net.devtech.industrialcrust.blocks.machines.batteries.BatteryBocs;
 import net.devtech.industrialcrust.blocks.machines.cables.CopperCable;
 import net.devtech.industrialcrust.blocks.machines.casings.BasicMachineCasing;
@@ -15,13 +17,16 @@ import net.devtech.industrialcrust.blocks.ores.TinOreBlock;
 import net.devtech.industrialcrust.blocks.ores.UraniumOreBlock;
 import net.devtech.industrialcrust.hwla.HWWLAManager;
 import net.devtech.industrialcrust.items.battery.BasicBattery;
-import net.devtech.industrialcrust.items.ingots.*;
 import net.devtech.industrialcrust.items.interfaces.CanConsume;
+import net.devtech.industrialcrust.items.materials.BukkitHammer;
 import net.devtech.industrialcrust.items.materials.Resin;
 import net.devtech.industrialcrust.items.materials.Scrap;
-import net.devtech.industrialcrust.items.plates.*;
-import net.devtech.industrialcrust.items.tools.BukkitHammer;
+import net.devtech.industrialcrust.items.materials.dust.*;
+import net.devtech.industrialcrust.items.materials.ingots.*;
+import net.devtech.industrialcrust.items.materials.plates.*;
 import net.devtech.industrialcrust.items.tools.TreeTap;
+import net.devtech.industrialcrust.listeners.CrustySmelterListener;
+import net.devtech.industrialcrust.listeners.OreListener;
 import net.devtech.industrialcrust.persistent.EmptyBlockPersistent;
 import net.devtech.industrialcrust.persistent.GsonPersistent;
 import net.devtech.utilib.functions.ThrowingSupplier;
@@ -29,13 +34,17 @@ import net.devtech.yajslib.persistent.AnnotatedPersistent;
 import net.devtech.yajslib.persistent.Persistent;
 import net.devtech.yajslib.persistent.PersistentRegistry;
 import net.devtech.yajslib.persistent.util.EmptyPersistent;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.lang.reflect.Constructor;
 
@@ -76,11 +85,27 @@ public final class IndustrialCrust extends JavaPlugin implements Listener {
 			registerEmpty(IronPlate.class, 439209032L);
 			registerEmpty(RefinedIronIngot.class, 89483828989328L);
 			registerEmpty(TinPlate.class, 9040930939209L);
+			// dust
+			registerEmpty(BronzeDust.class, 8943893489389L);
+			registerEmpty(ClayDust.class, 84389389289892L);
+			registerEmpty(CoalDust.class, 87348732873287L);
+			registerEmpty(CopperDust.class, 950948938928278L);
+			registerEmpty(DiamondDust.class, 894893209209120909L);
+			registerEmpty(GoldDust.class, 784832873487487783L);
+			registerEmpty(IronDust.class, 904893894389943893L);
+			registerEmpty(LapisDust.class, 894893892893898932L);
+			registerEmpty(LeadDust.class, 43838389894893489L);
+			registerEmpty(LithiumDust.class, 89348387874378L);
+			registerEmpty(SiliconDioxide.class, 8954894393493489L);
+			registerEmpty(SilverDust.class, 949389489893L);
+			registerEmpty(StoneDust.class, 8489348989489340934L);
+			registerEmpty(TinDust.class, 94873873287348738L);
 			// machines
 			registerEmptyBlock(BasicMachineCasing.class, 5438922932L);
 			registerAnnotatedBlock(BatteryBocs.class, 3435434544343433L);
 			registerAnnotatedBlock(CopperCable.class, 54564634563487548L);
 			registerAnnotatedBlock(CoalGenerator.class, 895695095093409409L);
+			registerAnnotatedBlock(Grinder.class, 3489389389L);
 			// batteries
 			registerGson(BasicBattery.class, 490328323289892L);
 		} catch (NoSuchMethodException e) {
@@ -89,6 +114,8 @@ public final class IndustrialCrust extends JavaPlugin implements Listener {
 
 		// hwla manager
 		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, this.hwwlaManager::tick, 2, 8);
+		this.getServer().getPluginManager().registerEvents(new CrustySmelterListener(), this);
+		this.getServer().getPluginManager().registerEvents(new OreListener(), this);
 		// Plugin startup logic
 	}
 
@@ -100,7 +127,7 @@ public final class IndustrialCrust extends JavaPlugin implements Listener {
 	@EventHandler
 	public void event(PlayerCommandPreprocessEvent event) {
 		Player player = event.getPlayer();
-		this.give(player, BatteryBocs.class);
+		this.give(player, Grinder.class);
 		this.give(player, CopperCable.class);
 		this.give(player, CoalGenerator.class);
 		this.give(player, BasicBattery.class);

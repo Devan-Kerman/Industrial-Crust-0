@@ -105,9 +105,9 @@ public class BatteryBocs extends AbstractBlockItem implements EnergyConsumer, En
 	private boolean lock;
 
 	@Override
-	public void tick() {
+	public void tickEnergy() {
 		this.lock = true;
-		EnergyConsumer.super.tick();
+		EnergyConsumer.super.tickEnergy();
 		this.lock = false;
 	}
 

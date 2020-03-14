@@ -19,7 +19,7 @@ import java.util.UUID;
  *
  * @author Dean B on 12/28/2016.
  */
-public class SkullCreator {
+public class SkullUtil {
 
 	/**
 	 * Creates a player skull based on a player's name.

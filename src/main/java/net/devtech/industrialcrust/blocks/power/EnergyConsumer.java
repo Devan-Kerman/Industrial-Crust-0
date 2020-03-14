@@ -9,11 +9,11 @@ import org.bukkit.block.BlockFace;
 
 public interface EnergyConsumer extends BlockDataAccess, EnergyHolder {
 	@LocalEvent
-	default void tick(TickEvent event) {
-		this.tick();
+	default void tickEnergy(TickEvent event) {
+		this.tickEnergy();
 	}
 
-	default void tick() {
+	default void tickEnergy() {
 		int toFill = Math.min(this.getMaxPower()-this.getPower(), this.getMaxCurrent());
 		for (BlockFace face : Positions.getFaces()) {
 			Location location = this.getLocation().add(face.getModX(), face.getModY(), face.getModZ());

@@ -1,4 +1,4 @@
-package net.devtech.industrialcrust.items.plates;
+package net.devtech.industrialcrust.items.materials.plates;
 
 import net.devtech.industrialcrust.items.AbstractNamedItem;
 import net.devtech.industrialcrust.items.interfaces.CanConsume;

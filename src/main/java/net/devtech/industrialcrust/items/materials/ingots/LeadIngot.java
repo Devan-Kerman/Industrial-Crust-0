@@ -1,4 +1,4 @@
-package net.devtech.industrialcrust.items.ingots;
+package net.devtech.industrialcrust.items.materials.ingots;
 
 import net.devtech.industrialcrust.items.AbstractNamedItem;
 import org.bukkit.ChatColor;

@@ -1,17 +1,17 @@
-package net.devtech.industrialcrust.items.plates;
+package net.devtech.industrialcrust.items.materials.ingots;
 
 import net.devtech.industrialcrust.items.AbstractNamedItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
-public class CopperPlate extends AbstractNamedItem {
+public class RefinedIronIngot extends AbstractNamedItem {
 	@Override
 	protected Material type() {
-		return Material.LEATHER;
+		return Material.IRON_INGOT;
 	}
 
 	@Override
 	protected String name() {
-		return ChatColor.GOLD+"Copper Plate";
+		return ChatColor.BLUE+"Refined Iron Ingot";
 	}
 }

@@ -12,11 +12,14 @@ import net.devtech.asyncore.util.inv.Inventories;
 import net.devtech.asyncore.world.server.ServerAccess;
 import net.devtech.industrialcrust.blocks.AbstractBlockItem;
 import net.devtech.industrialcrust.blocks.power.EnergyProducer;
+import net.devtech.industrialcrust.util.BukkitSerializers;
 import net.devtech.industrialcrust.util.BurnTime;
 import net.devtech.yajslib.annotations.Reader;
 import net.devtech.yajslib.annotations.Writer;
 import net.devtech.yajslib.io.PersistentInput;
+import net.devtech.yajslib.io.PersistentInputStream;
 import net.devtech.yajslib.io.PersistentOutput;
+import net.devtech.yajslib.io.PersistentOutputStream;
 import net.devtech.yajslib.persistent.PersistentRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -43,11 +46,11 @@ public class CoalGenerator extends AbstractBlockItem implements EnergyProducer {
 	@LocalEvent
 	private void tick(TickEvent event) {
 		AsynCore.guiManager.resync(this.inventory);
-		if(this.burnTime <= 0) {
+		if (this.burnTime <= 0) {
 			ItemStack[] next = {null};
 			Inventories.mergeOne(this.burning, next);
 			ItemStack burn = next[0];
-			if(burn != null) {
+			if (burn != null) {
 				this.maxTime = BurnTime.getBurnTime(burn.getType());
 				this.burnTime = this.maxTime;
 				AsynCore.guiManager.redraw(this.inventory);
@@ -113,16 +116,20 @@ public class CoalGenerator extends AbstractBlockItem implements EnergyProducer {
 	}
 
 	@Writer (895695095093409409L)
-	private void write(PersistentOutput out) throws IOException {
+	private void write(PersistentOutput out) throws Exception {
 		out.writePersistent(this.getLocation());
 		out.writeInt(this.power);
-		out.writeArrayNoLength(this.burning);
+		BukkitSerializers.saveItems(this.burning, (PersistentOutputStream) out);
+		out.writeInt(this.burnTime);
+		out.writeInt(this.maxTime);
 	}
 
 	@Reader (895695095093409409L)
-	private void read(PersistentInput in) throws IOException {
+	private void read(PersistentInput in) throws Exception {
 		this.setLocation((Location) in.readPersistent());
 		this.power = in.readInt();
-		in.readArray(this.burning);
+		this.burning = BukkitSerializers.loadItems((PersistentInputStream) in);
+		this.burnTime = in.readInt();
+		this.maxTime = in.readInt();
 	}
 }

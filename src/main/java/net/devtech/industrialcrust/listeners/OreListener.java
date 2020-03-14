@@ -22,8 +22,7 @@ public class OreListener implements Listener {
 		Block block = event.getBlock();
 		if (block.getType() == Material.IRON_ORE && RANDOM.nextBoolean()) { // 50% of iron will drop custom ores
 			event.setDropItems(false);
-			block.getWorld().dropItemNaturally(block.getLocation(), CustomItemFactory
-			                                                        .createNew(AsynCore.persistentRegistry, this.getOre()));
+			block.getWorld().dropItemNaturally(block.getLocation(), CustomItemFactory.createNew(AsynCore.persistentRegistry, this.getOre())).setInvulnerable(true);
 		}
 	}
 

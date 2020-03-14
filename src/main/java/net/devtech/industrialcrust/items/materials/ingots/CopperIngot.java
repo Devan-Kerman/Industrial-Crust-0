@@ -1,17 +1,17 @@
-package net.devtech.industrialcrust.items.ingots;
+package net.devtech.industrialcrust.items.materials.ingots;
 
 import net.devtech.industrialcrust.items.AbstractNamedItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
-public class TinIngot extends AbstractNamedItem {
+public class CopperIngot extends AbstractNamedItem {
 	@Override
 	protected Material type() {
-		return Material.IRON_INGOT;
+		return Material.CLAY_BRICK;
 	}
 
 	@Override
 	protected String name() {
-		return ChatColor.GRAY+"Tin Ingot";
+		return ChatColor.GOLD+"Copper Ingot";
 	}
 }
