@@ -11,6 +11,7 @@ import net.devtech.asyncore.util.Size2i;
 import net.devtech.asyncore.util.inv.ArrayInvWrapper;
 import net.devtech.asyncore.util.inv.InvWrapper;
 import net.devtech.asyncore.util.inv.Inventories;
+import net.devtech.asyncore.util.persistents.BukkitPersistent;
 import net.devtech.asyncore.world.server.ServerAccess;
 import net.devtech.industrialcrust.gui.ABackgroundPanel;
 import net.devtech.industrialcrust.items.materials.dust.*;
@@ -25,6 +26,7 @@ import net.devtech.yajslib.io.PersistentOutput;
 import net.devtech.yajslib.io.PersistentOutputStream;
 import net.devtech.yajslib.persistent.PersistentRegistry;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -33,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 
 import static net.devtech.asyncore.AsynCore.persistentRegistry;
@@ -78,7 +81,7 @@ public class Grinder extends IC0Machine {
 	protected ItemStack[] inputs = new ItemStack[9];
 	protected ItemStack[] outputs = new ItemStack[9];
 
-	protected Grinder(PersistentRegistry registry, ServerAccess<Object> access) {
+	public Grinder(PersistentRegistry registry, ServerAccess<Object> access) {
 		super(registry, access);
 	}
 
@@ -163,22 +166,28 @@ public class Grinder extends IC0Machine {
 		return false;
 	}
 
-	@Reader (3489389389L)
+	@Reader (3489348732873889389L)
 	private void read(PersistentInput input) throws Exception {
-		this.inputs = BukkitSerializers.loadItems((PersistentInputStream) input);
-		this.outputs = BukkitSerializers.loadItems((PersistentInputStream) input);
+		//this.inputs = BukkitSerializers.loadItems((PersistentInputStream) input);
+		//this.outputs = BukkitSerializers.loadItems((PersistentInputStream) input);
 		this.progress = input.readDouble();
 		this.power = input.readInt();
 		this.uuid = input.readUUID();
+		System.out.println("progress" + this.uuid);
+		System.out.println(input.readLong() + " ==d==d=awd=a=wd===");
+		this.setLocation((Location) input.readPersistent());
 	}
 
-	@Writer (3489389389L)
+	@Writer (3489348732873889389L)
 	private void write(PersistentOutput output) throws Exception {
-		BukkitSerializers.saveItems(this.inputs, (PersistentOutputStream) output);
-		BukkitSerializers.saveItems(this.outputs, (PersistentOutputStream) output);
+		//BukkitSerializers.saveItems(this.inputs, (PersistentOutputStream) output);
+		//BukkitSerializers.saveItems(this.outputs, (PersistentOutputStream) output);
 		output.writeDouble(this.progress);
 		output.writeInt(this.power);
-		output.writeUUID(this.uuid);
+		output.writeUUID(UUID.randomUUID());
+		System.out.println(this.getLocation() + " =====================================");
+		output.writeLong(438932898932L);
+		output.writePersistent(this.getLocation());
 	}
 
 }

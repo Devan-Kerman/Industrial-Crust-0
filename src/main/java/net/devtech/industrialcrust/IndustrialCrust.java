@@ -105,7 +105,7 @@ public final class IndustrialCrust extends JavaPlugin implements Listener {
 			registerAnnotatedBlock(BatteryBocs.class, 3435434544343433L);
 			registerAnnotatedBlock(CopperCable.class, 54564634563487548L);
 			registerAnnotatedBlock(CoalGenerator.class, 895695095093409409L);
-			registerAnnotatedBlock(Grinder.class, 3489389389L);
+			registerAnnotatedBlock(Grinder.class, 3489348732873889389L);
 			// batteries
 			registerGson(BasicBattery.class, 490328323289892L);
 		} catch (NoSuchMethodException e) {
